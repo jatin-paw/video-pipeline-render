@@ -13,9 +13,13 @@ def get_credentials():
     """OAuth refresh token (uploads as you, uses your Drive quota) or service account (Shared Drives only)."""
     if os.environ.get("GDRIVE_REFRESH_TOKEN"):
         from google.oauth2.credentials import Credentials
+        cid, sec, rt = (os.environ.get(k, "") for k in ("GDRIVE_CLIENT_ID", "GDRIVE_CLIENT_SECRET", "GDRIVE_REFRESH_TOKEN"))
+        print(f"diag: client_id={cid[:22]!r}... len={len(cid)} ws={cid != cid.strip()} | "
+              f"secret len={len(sec)} starts_GOCSPX={sec.startswith('GOCSPX-')} ws={sec != sec.strip()} | "
+              f"refresh len={len(rt)} starts_1//={rt.startswith('1//')} ws={rt != rt.strip()}")
         return Credentials(
-            None, refresh_token=os.environ["GDRIVE_REFRESH_TOKEN"],
-            client_id=os.environ["GDRIVE_CLIENT_ID"], client_secret=os.environ["GDRIVE_CLIENT_SECRET"],
+            None, refresh_token=rt.strip(),
+            client_id=cid.strip(), client_secret=sec.strip(),
             token_uri="https://oauth2.googleapis.com/token",
             scopes=["https://www.googleapis.com/auth/drive"])
     raw = os.environ.get("GDRIVE_SERVICE_ACCOUNT_JSON", "").strip()
