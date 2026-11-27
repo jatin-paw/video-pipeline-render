@@ -2,3 +2,4 @@ build/
 __pycache__/
 *.json.key
 .env
+.refresh_token.txt
