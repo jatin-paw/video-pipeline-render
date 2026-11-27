@@ -6,7 +6,7 @@ Opens a browser, you approve, it prints GDRIVE_CLIENT_ID / SECRET / REFRESH_TOKE
 import json, sys
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-flow = InstalledAppFlow.from_client_secrets_file(sys.argv[1], ["https://www.googleapis.com/auth/drive.file"])
+flow = InstalledAppFlow.from_client_secrets_file(sys.argv[1], ["https://www.googleapis.com/auth/drive"])
 c = flow.run_local_server(port=0, access_type="offline", prompt="consent")
 print("\nGDRIVE_CLIENT_ID     =", c.client_id)
 print("GDRIVE_CLIENT_SECRET =", c.client_secret)
