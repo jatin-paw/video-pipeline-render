@@ -11,8 +11,17 @@ from googleapiclient.http import MediaFileUpload
 
 
 def main(path: str, name: str) -> None:
+    raw = os.environ.get("GDRIVE_SERVICE_ACCOUNT_JSON", "").strip()
+    if not os.environ.get("GDRIVE_FOLDER_ID", "").strip():
+        sys.exit("GDRIVE_FOLDER_ID secret is missing or empty")
+    try:
+        info = json.loads(raw)
+        assert info.get("type") == "service_account" and info.get("private_key")
+    except Exception:
+        sys.exit(f"GDRIVE_SERVICE_ACCOUNT_JSON is not a service-account key JSON "
+                 f"(length {len(raw)}, starts with {raw[:1]!r}). Paste the whole key file, starting with '{{'.")
     creds = service_account.Credentials.from_service_account_info(
-        json.loads(os.environ["GDRIVE_SERVICE_ACCOUNT_JSON"]),
+        info,
         scopes=["https://www.googleapis.com/auth/drive"])
     drive = build("drive", "v3", credentials=creds, cache_discovery=False)
     f = drive.files().create(
