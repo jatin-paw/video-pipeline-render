@@ -1,0 +1,33 @@
+name: Render and upload videos
+on:
+  push:
+    paths: ["scripts/*.json"]
+  workflow_dispatch:
+    inputs:
+      script: { description: "Script file to render (e.g. scripts/example.json)", required: true }
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements.txt
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+      - name: Pick scripts
+        id: pick
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "files=${{ inputs.script }}" >> "$GITHUB_OUTPUT"
+          else
+            before="${{ github.event.before }}"
+            if echo "$before" | grep -qE '^0+$'; then range="HEAD~1 HEAD"; else range="$before ${{ github.sha }}"; fi
+            echo "files=$(git diff --name-only --diff-filter=AM $range -- 'scripts/*.json' | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Render and upload
+        if: steps.pick.outputs.files != ''
+        run: src/build_all.sh ${{ steps.pick.outputs.files }}
+        env:
+          GDRIVE_SERVICE_ACCOUNT_JSON: ${{ secrets.GDRIVE_SERVICE_ACCOUNT_JSON }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}

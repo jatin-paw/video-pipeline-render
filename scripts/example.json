@@ -1,0 +1,4 @@
+{"title":"How Git Works","scenes":[
+{"narration":"Git is a time machine for your code. Every save point is called a commit.","headline":"Git: a time machine","bullets":["Commits are snapshots","Every change is tracked"]},
+{"narration":"Branches let you try ideas without breaking the main line of work.","headline":"Branches","bullets":["Experiment safely","Merge when ready"]},
+{"narration":"Push your work to a remote like GitHub, and automation can take it from there.","headline":"Push and automate","bullets":["Remote backup","Actions run on push"]}]}
